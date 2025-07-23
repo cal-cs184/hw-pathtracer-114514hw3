@@ -183,11 +183,18 @@ void PathTracer::raytrace_pixel(size_t x, size_t y) {
   // Use the command line parameters "samplesPerBatch" and "maxTolerance"
   int num_samples = ns_aa;          // total samples to evaluate
   Vector2D origin = Vector2D(x, y); // bottom left corner of the pixel
-
-
-  sampleBuffer.update_pixel(Vector3D(0.2, 1.0, 0.8), x, y);
+  Vector3D sum_samples(0, 0, 0);
+  
+  for (int i = 0; i < num_samples; i++)
+  {
+      Ray new_ray = camera->generate_ray((double)(x + random_uniform()) / sampleBuffer.w, (double)(y + random_uniform()) / sampleBuffer.h);
+      sum_samples += est_radiance_global_illumination(new_ray);
+  }
+  sum_samples /= num_samples;
+  sampleBuffer.update_pixel(sum_samples, x, y);
   sampleCountBuffer[x + y * sampleBuffer.w] = num_samples;
-
+  //sampleBuffer.update_pixel(Vector3D(0.2, 1.0, 0.8), x, y);
+  //sampleCountBuffer[x + y * sampleBuffer.w] = num_samples;
 
 }
 
